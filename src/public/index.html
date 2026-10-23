@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iPaaS Webhook to Google Sheets | Configurador Fácil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-gradient: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 50%, #020617 100%);
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --card-border: rgba(148, 163, 184, 0.15);
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent: #10b981;
+      --warning: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --code-bg: rgba(15, 23, 42, 0.85);
+      --error-bg: rgba(239, 68, 68, 0.15);
+      --error-border: #ef4444;
+      --success-bg: rgba(16, 185, 129, 0.15);
+      --success-border: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2.5rem 1rem;
+    }
+
+    .container {
+      max-width: 860px;
+      width: 100%;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #a5b4fc;
+      padding: 0.35rem 0.9rem;
+      border-radius: 9999px;
+      font-size: 0.825rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 60%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.75rem;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      line-height: 1.6;
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 1.25rem;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .step-number {
+      width: 2.2rem;
+      height: 2.2rem;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #fff;
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+    }
+
+    .step-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .highlight-box {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 0.85rem;
+      padding: 1.25rem;
+      margin: 1rem 0;
+    }
+
+    .highlight-box h3 {
+      font-size: 1.05rem;
+      color: #34d399;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .step-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      color: #cbd5e1;
+      font-size: 0.95rem;
+      margin-top: 0.75rem;
+    }
+
+    .step-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+      line-height: 1.5;
+    }
+
+    .step-list .bullet {
+      background: var(--accent);
+      color: #022c22;
+      width: 1.35rem;
+      height: 1.35rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+
+    .details-toggle {
+      margin-top: 1rem;
+      font-size: 0.875rem;
+      color: #94a3b8;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: color 0.2s;
+    }
+
+    .details-toggle:hover {
+      color: #cbd5e1;
+    }
+
+    .email-drawer {
+      display: none;
+      background: var(--code-bg);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      margin-top: 0.75rem;
+    }
+
+    .email-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      word-break: break-all;
+    }
+
+    .email-text {
+      font-family: monospace;
+      font-size: 0.9rem;
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    .btn {
+      cursor: pointer;
+      border: none;
+      border-radius: 0.6rem;
+      padding: 0.65rem 1.2rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-secondary {
+      background: rgba(148, 163, 184, 0.15);
+      color: var(--text-main);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+    .btn-secondary:hover {
+      background: rgba(148, 163, 184, 0.25);
+    }
+
+    .btn-copy {
+      padding: 0.45rem 0.85rem;
+      font-size: 0.8rem;
+      background: rgba(99, 102, 241, 0.2);
+      color: #c7d2fe;
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      flex-shrink: 0;
+    }
+    .btn-copy:hover {
+      background: rgba(99, 102, 241, 0.35);
+      color: #fff;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 0.5rem;
+    }
+
+    .help-hint {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+
+    input, select {
+      width: 100%;
+      background: var(--code-bg);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 0.65rem;
+      padding: 0.75rem 1rem;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 640px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .result-alert {
+      border-radius: 0.75rem;
+      padding: 1rem 1.25rem;
+      margin-top: 1rem;
+      display: none;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .result-alert.success {
+      display: block;
+      background: var(--success-bg);
+      border: 1px solid var(--success-border);
+      color: #6ee7b7;
+    }
+
+    .result-alert.error {
+      display: block;
+      background: var(--error-bg);
+      border: 1px solid var(--error-border);
+      color: #fca5a5;
+    }
+
+    .domain-notice {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 0.65rem;
+      padding: 0.75rem 1rem;
+      color: #fcd34d;
+      font-size: 0.825rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .webhook-output {
+      background: var(--code-bg);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 0.75rem;
+      padding: 1.15rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .webhook-url {
+      font-family: monospace;
+      font-size: 0.925rem;
+      color: #34d399;
+      word-break: break-all;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      line-height: 1.5;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.825rem;
+      margin-top: auto;
+      padding-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="badge">Micro-iPaaS Zero-Config</div>
+      <h1>Webhook para Google Sheets</h1>
+      <p class="subtitle">Sem necessidade de chaves de API pelo cliente. Apenas compartilhe o link da planilha como Editor!</p>
+    </header>
+
+    <!-- PASSO 1: LIBERAR ACESSO DA PLANILHA (SEM COMPLEXIDADE) -->
+    <div class="card">
+      <div class="step-header">
+        <div class="step-number">1</div>
+        <div class="step-title">Liberar o Acesso na sua Planilha Google</div>
+      </div>
+
+      <div class="highlight-box">
+        <h3>🔗 Como compartilhar (Apenas 2 cliques):</h3>
+        <ul class="step-list">
+          <li>
+            <span class="bullet">1</span>
+            <span>Abra a sua planilha no Google Sheets e clique no botão <strong>Compartilhar</strong> (no canto superior direito).</span>
+          </li>
+          <li>
+            <span class="bullet">2</span>
+            <span>Em <strong>"Acesso Geral"</strong>, troque de <em>Restrito</em> para <strong>"Qualquer pessoa com o link"</strong> e selecione a permissão <strong>"Editor"</strong>.</span>
+          </li>
+        </ul>
+      </div>
+
+      <p style="color: var(--text-muted); font-size: 0.875rem;">
+        ✨ <em>Pronto! Não é necessário criar abas ou cabeçalhos antes. O sistema cria a aba e as colunas automaticamente na primeira venda.</em>
+      </p>
+
+      <div class="details-toggle" onclick="toggleEmailDrawer()">
+        <span>🔒 Prefere manter a planilha privada? Convidar por e-mail &darr;</span>
+      </div>
+
+      <div class="email-drawer" id="emailDrawer">
+        <p style="font-size: 0.85rem; color: var(--text-muted);">
+          Se não quiser liberar o link público, adicione este e-mail como <strong>Editor</strong> na sua planilha:
+        </p>
+        <div class="email-box">
+          <span class="email-text" id="serviceAccountEmail">Carregando e-mail...</span>
+          <button class="btn btn-copy" onclick="copyServiceAccount()">📋 Copiar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASSO 2: CONFIGURAÇÃO -->
+    <div class="card">
+      <div class="step-header">
+        <div class="step-number">2</div>
+        <div class="step-title">Conectar sua Planilha</div>
+      </div>
+
+      <div class="form-group">
+        <label for="sheetInput">Link da Planilha do Google</label>
+        <input type="text" id="sheetInput" placeholder="Ex: https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit" oninput="generateWebhookUrl()">
+        <p class="help-hint">Cole o link completo copiado da barra de endereços do seu navegador.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="platformSelect">Plataforma de Pagamento</label>
+          <select id="platformSelect" onchange="generateWebhookUrl()">
+            <option value="hotmart">Hotmart</option>
+            <option value="hubla">Hubla</option>
+            <option value="zouti">Zouti</option>
+            <option value="tmb">TMB Educação</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="tabInput">Nome da Aba (Página)</label>
+          <input type="text" id="tabInput" value="Vendas" placeholder="Ex: Vendas" oninput="generateWebhookUrl()">
+          <p class="help-hint">Se a aba não existir, ela será criada automaticamente.</p>
+        </div>
+      </div>
+
+      <button class="btn btn-secondary" onclick="testConnection()" id="btnTest">
+        🔍 Testar Conexão com a Planilha
+      </button>
+
+      <div id="validationResult" class="result-alert"></div>
+    </div>
+
+    <!-- PASSO 3: URL DO WEBHOOK PARA PRODUÇÃO -->
+    <div class="card" id="step3Card">
+      <div class="step-header">
+        <div class="step-number">3</div>
+        <div class="step-title">Sua URL de Webhook Pública</div>
+      </div>
+
+      <div id="domainAlert" class="domain-notice" style="display: none;">
+        <span>⚠️ <strong>Atenção:</strong> Plataformas de pagamento (Hotmart, Hubla, Zouti, etc.) exigem uma <strong>URL pública HTTPS</strong> na internet, rejeitando endereços locais.</span>
+      </div>
+
+      <div class="form-group">
+        <label for="serverDomainInput">Domínio Público do Servidor (HTTPS)</label>
+        <input type="text" id="serverDomainInput" placeholder="Ex: https://seu-app.onrender.com ou https://meu-dominio.com" oninput="generateWebhookUrl()">
+        <p class="help-hint">Insira o link público onde este projeto está publicado (ex: Render, Vercel, Railway ou túnel Ngrok).</p>
+      </div>
+
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.75rem;">
+        URL final pronta para colar na configuração de Webhook/Postback da sua plataforma:
+      </p>
+
+      <div class="webhook-output">
+        <div class="webhook-url" id="generatedWebhookUrl">Preencha o link da planilha no Passo 2 acima...</div>
+        <div>
+          <button class="btn btn-primary" onclick="copyWebhookUrl()">📋 Copiar URL do Webhook</button>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Micro-iPaaS Backend &bull; Node.js + TypeScript &bull; Hotmart, Hubla, Zouti, TMB Educação
+    </footer>
+  </div>
+
+  <script>
+    let serviceAccountEmail = '';
+
+    // Detecta o domínio público base
+    function getInitialDomain() {
+      const origin = window.location.origin;
+      // Se não for local ou file, usa o próprio domínio público acessado
+      if (origin && !origin.includes('file://') && !origin.includes('localhost') && !origin.includes('127.0.0.1')) {
+        return origin;
+      }
+      return '';
+    }
+
+    // Inicialização da página
+    window.addEventListener('DOMContentLoaded', () => {
+      const initialDomain = getInitialDomain();
+      const domainInput = document.getElementById('serverDomainInput');
+      const domainAlert = document.getElementById('domainAlert');
+
+      if (initialDomain) {
+        domainInput.value = initialDomain;
+      } else {
+        // Se estiver em localhost ou file://, avisa e sugere placeholder de produção
+        domainAlert.style.display = 'flex';
+        domainInput.value = 'https://seu-dominio.com';
+      }
+
+      loadServiceAccount();
+      generateWebhookUrl();
+    });
+
+    async function loadServiceAccount() {
+      try {
+        const res = await fetch('/api/service-account');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.serviceAccountEmail && !data.serviceAccountEmail.includes('Não configurado')) {
+            serviceAccountEmail = data.serviceAccountEmail;
+            document.getElementById('serviceAccountEmail').innerText = serviceAccountEmail;
+          } else {
+            document.getElementById('serviceAccountEmail').innerText = 'service-account@seu-projeto.iam.gserviceaccount.com';
+          }
+        } else {
+          document.getElementById('serviceAccountEmail').innerText = 'service-account@seu-projeto.iam.gserviceaccount.com';
+        }
+      } catch (err) {
+        document.getElementById('serviceAccountEmail').innerText = 'service-account@seu-projeto.iam.gserviceaccount.com';
+      }
+    }
+
+    function toggleEmailDrawer() {
+      const drawer = document.getElementById('emailDrawer');
+      drawer.style.display = drawer.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function extractSheetId(input) {
+      if (!input) return '';
+      const match = input.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+      if (match && match[1]) return match[1];
+      return input.split(/[/?#]/)[0].trim();
+    }
+
+    function generateWebhookUrl() {
+      const sheetInput = document.getElementById('sheetInput').value.trim();
+      const platform = document.getElementById('platformSelect').value;
+      let tabName = document.getElementById('tabInput').value.trim() || 'Vendas';
+      let domain = document.getElementById('serverDomainInput').value.trim();
+
+      const cleanId = extractSheetId(sheetInput);
+      const urlElement = document.getElementById('generatedWebhookUrl');
+
+      if (!cleanId) {
+        urlElement.innerText = 'Preencha o link da planilha no Passo 2 acima...';
+        return;
+      }
+
+      // Garante que o domínio comece com https:// ou http://
+      if (domain && !domain.startsWith('http://') && !domain.startsWith('https://')) {
+        domain = 'https://' + domain;
+      }
+      if (!domain || domain.includes('file://')) {
+        domain = 'https://seu-dominio.com';
+      }
+      domain = domain.replace(/\/+$/, ''); // remove barra no final
+
+      const webhookUrl = `${domain}/api/webhook/${platform}/${cleanId}/${encodeURIComponent(tabName)}`;
+      urlElement.innerText = webhookUrl;
+    }
+
+    async function testConnection() {
+      const sheetInput = document.getElementById('sheetInput').value.trim();
+      const resultDiv = document.getElementById('validationResult');
+      const btnTest = document.getElementById('btnTest');
+
+      if (!sheetInput) {
+        resultDiv.className = 'result-alert error';
+        resultDiv.innerText = 'Por favor, insira o link da planilha antes de testar.';
+        return;
+      }
+
+      btnTest.disabled = true;
+      btnTest.innerText = '⏳ Verificando permissões...';
+      resultDiv.style.display = 'none';
+
+      try {
+        const res = await fetch('/api/validate-sheet', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sheetUrl: sheetInput })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.valid) {
+          resultDiv.className = 'result-alert success';
+          resultDiv.innerHTML = `<strong>Conexão bem sucedida!</strong><br>` +
+            `Planilha: <em>${data.title}</em><br>` +
+            `Abas encontradas: ${data.sheets.join(', ')}<br>` +
+            `O sistema tem permissão para inserir novas vendas.`;
+        } else {
+          resultDiv.className = 'result-alert error';
+          resultDiv.innerHTML = `<strong>Falha na conexão:</strong> ${data.error || 'Não autorizado'}<br>` +
+            `Verifique se você alterou em <strong>Acesso Geral</strong> para <strong>"Qualquer pessoa com o link"</strong> como <strong>"Editor"</strong>.`;
+        }
+      } catch (err) {
+        resultDiv.className = 'result-alert error';
+        resultDiv.innerText = 'Aviso: O teste direto requer que a API esteja em execução no servidor. Quando o projeto estiver publicado no GitHub/Render, a validação automática funcionará normalmente.';
+      } finally {
+        btnTest.disabled = false;
+        btnTest.innerText = '🔍 Testar Conexão com a Planilha';
+      }
+    }
+
+    function copyServiceAccount() {
+      const email = serviceAccountEmail || document.getElementById('serviceAccountEmail').innerText;
+      navigator.clipboard.writeText(email);
+      alert('E-mail copiado! Se optar pelo método restrito, cole no campo "Compartilhar" da sua planilha.');
+    }
+
+    function copyWebhookUrl() {
+      const url = document.getElementById('generatedWebhookUrl').innerText;
+      if (url.startsWith('http')) {
+        navigator.clipboard.writeText(url);
+        alert('URL do Webhook copiada com sucesso! Cole na configuração de webhook da sua plataforma.');
+      } else {
+        alert('Preencha o link da planilha antes de copiar a URL.');
+      }
+    }
+  </script>
+</body>
+</html>

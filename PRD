@@ -1,0 +1,51 @@
+# [PRD e Instruções de Sistema] - Construção de um iPaaS focado em Webhooks para Google Planilhas
+
+## 1. Contexto do Projeto
+Você vai atuar como um Engenheiro de Software Sênior e Arquiteto de Soluções. Nossa missão é construir o backend de um micro-iPaaS (Integration Platform as a Service). O sistema tem um único objetivo: receber webhooks de plataformas de pagamento digitais e inserir esses dados, de forma estruturada, em abas específicas de planilhas do Google (Google Sheets).
+
+## 2. Stack Tecnológico Obrigatório
+* **Linguagem:** Node.js com TypeScript.
+* **Framework Web:** Express (ou Fastify) / Preparado para rodar em ambiente Serverless (ex: Google Cloud Functions ou Vercel).
+* **Integração Google:** Biblioteca oficial `googleapis`.
+* **Autenticação no Google Sheets:** Via Google Service Account (Conta de Serviço).
+
+## 3. Arquitetura e Fluxo de Dados Desejado
+1. **Endpoint de Entrada:** O sistema deve ter uma rota dinâmica, por exemplo: `POST /api/webhook/:plataforma/:sheetId/:tabName`.
+2. **Recepção:** Receber o payload JSON.
+3. **Roteamento e Parser:** Identificar a `:plataforma` na URL e enviar o payload para a classe/função responsável por "traduzir" os dados daquela plataforma específica.
+4. **Normalização:** Todos os parsers devem retornar um objeto TypeScript padronizado chamado `StandardizedSale` contendo:
+   - Nome do cliente
+   - E-mail
+   - Telefone
+   - Nome do Produto
+   - Valor
+   - Status da Compra (ex: Aprovado, Boleto Impresso, Recusado)
+   - Data da Transação
+5. **Escrita no Google Sheets:** O sistema converte o `StandardizedSale` em um Array (linha) e usa a API do Google para dar um "append row" no `:sheetId` e na aba `:tabName` recebidos na URL.
+
+## 4. Documentações e Criação dos Parsers
+Abaixo estão os links oficiais da documentação de webhooks (postback) de cada plataforma que daremos suporte. 
+**Sua primeira tarefa de código será:** Ler/navegar por esses links usando suas capacidades de navegação e criar uma pasta `parsers` com um arquivo `.ts` para cada plataforma, extraindo os campos necessários do payload JSON deles para o nosso `StandardizedSale`.
+
+* **Hotmart:** [https://developers.hotmart.com/docs/pt-BR/1.0.0/webhook/about-webhook/]
+* **Hubla:** [https://hubla.gitbook.io/docs/webhooks/introducao]
+* **Zouti:** [https://ajuda.zouti.com.br/pt-br/articles/9740997-como-configurar-webhook]
+* **TMB Educação:** [https://info.tmbeducacao.com.br/portal-do-produtor/central-de-ajuda/produto/integracoes/vendas]
+
+## 5. Regras de Negócio e Segurança
+* **Resiliência:** Como é um webhook, o endpoint deve retornar `200 OK` para a plataforma de pagamento o mais rápido possível, preferencialmente processando a escrita no Google Sheets de forma assíncrona para evitar timeouts.
+* **Tratamento de Erros:** Se o payload vier malformado ou o Google Sheets rejeitar a inserção, deve haver um log claro do erro (console.error ou integração com serviço de log básico).
+* **Autenticação:** Crie um módulo isolado de autenticação do Google Sheets que consumirá as variáveis de ambiente `GOOGLE_CLIENT_EMAIL` e `GOOGLE_PRIVATE_KEY`.
+
+## 6. Plano de Ação (Step-by-Step)
+Siga esta ordem de execução:
+1. Analise este PRD e confirme o entendimento.
+2. Acesse as URLs fornecidas, analise os payloads de exemplo das documentações.
+3. Crie a estrutura de pastas do projeto, inicialize o `package.json` e configure o TypeScript.
+4. Crie a interface padronizada `StandardizedSale`.
+5. Codifique os Parsers (um arquivo para cada plataforma).
+6. Codifique o módulo de integração com o Google Sheets (`googleSheetsService.ts`).
+7. Codifique as rotas da API e conecte os parsers ao serviço do Google.
+8. Entregue instruções de como configurar o `.env` e rodar localmente para testes.
+
+Pode iniciar a execução pelo Passo 1 e 2. Aguardo sua confirmação e o código dos parsers.
