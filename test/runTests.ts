@@ -170,7 +170,46 @@ async function runAllTests() {
   assert(tmbSale.value === 2500.0, 'Valor deve ser 2500.00');
   assert(tmbSale.status === 'Aprovado', 'Status deve ser Aprovado');
   console.log('Linha Google Sheets:', saleToSheetRow(tmbSale));
-  console.log('✅ TmbParser validado com sucesso!\n');
+  // ==========================================
+  // 5. TESTE KIWIFY
+  // ==========================================
+  console.log('--- Testando KiwifyParser ---');
+  const kiwifyParser = getParser('kiwify');
+  assert(!!kiwifyParser, 'Parser para kiwify deve ser encontrado');
+
+  const kiwifyPayload = {
+    order_id: '7f7e2b76-6339-49af-8788-e753e76b61c1',
+    order_ref: 'UOcHGBY',
+    order_status: 'paid',
+    payment_method: 'credit_card',
+    created_at: '2026-10-23 12:30:00',
+    approved_date: '2026-10-23 12:30:15',
+    webhook_event_type: 'order_approved',
+    Product: {
+      product_id: '2a14ad80-7edc-4f06-a237-aa4ae3d0f2c8',
+      product_name: 'Método Vendas Automáticas',
+    },
+    Customer: {
+      full_name: 'Camila Fernandes',
+      email: 'camila.fernandes@example.com',
+      mobile: '+5511988889999',
+    },
+    Commissions: {
+      charge_amount: 19700,
+      product_base_price: 19700,
+    },
+  };
+
+  const kiwifySale = kiwifyParser!.parse(kiwifyPayload);
+  console.log('Venda Kiwify normalizada:', kiwifySale);
+  assert(kiwifySale.customerName === 'Camila Fernandes', 'Nome deve ser Camila Fernandes');
+  assert(kiwifySale.email === 'camila.fernandes@example.com', 'E-mail deve bater');
+  assert(kiwifySale.phone === '+5511988889999', 'Telefone deve bater');
+  assert(kiwifySale.productName === 'Método Vendas Automáticas', 'Produto deve ser Método Vendas Automáticas');
+  assert(kiwifySale.value === 197.0, 'Valor deve ser 197.00 (convertido de centavos 19700)');
+  assert(kiwifySale.status === 'Aprovado', 'Status deve ser Aprovado');
+  console.log('Linha Google Sheets:', saleToSheetRow(kiwifySale));
+  console.log('✅ KiwifyParser validado com sucesso!\n');
 
   console.log('🎉 TODOS OS PARSERS FORAM TESTADOS E VALIDADOS COM SUCESSO!');
 }

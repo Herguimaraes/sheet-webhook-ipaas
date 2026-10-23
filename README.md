@@ -32,6 +32,7 @@ O sistema conta com uma interface gráfica acessível diretamente na raiz do ser
 | **Hubla** | `hubla` | Webhook 2.0 | `invoice.paid`, `invoice.created`, `invoice.refunded`, `invoice.failed` |
 | **Zouti** | `zouti` | Vendas / Pagamentos | `ORDER_PAID`, `BOLETO_CREATED`, `PIX_CREATED`, `SUBSCRIPTION_ACTIVATED` |
 | **TMB Educação** | `tmb` | Vendas / Parcelamento | `Efetivado`, `Cancelado`, `Pendente` |
+| **Kiwify** | `kiwify` | Webhook Oficial | `paid`, `waiting_payment`, `refunded`, `refused` |
 
 ---
 
