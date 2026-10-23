@@ -5,8 +5,8 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
-    "postinstall": "tsc",
+    "build": "tsc && node -e \"require('fs').cpSync('public', 'dist/public', {recursive: true, force: true})\"",
+    "postinstall": "tsc && node -e \"require('fs').cpSync('public', 'dist/public', {recursive: true, force: true})\"",
     "start": "node dist/server.js",
     "test": "tsx test/runTests.ts && tsx test/e2eTest.ts",
     "test:parsers": "tsx test/runTests.ts",
