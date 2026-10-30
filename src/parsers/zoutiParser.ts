@@ -1,4 +1,4 @@
-import { StandardizedSale } from '../types/sale';
+import { StandardizedSale, normalizePaymentMethod } from '../types/sale';
 import { WebhookParser } from './baseParser';
 
 export class ZoutiParser implements WebhookParser {
@@ -58,14 +58,16 @@ export class ZoutiParser implements WebhookParser {
     // 6. Status da Compra (checa x-zouti-event-type do header se fornecido, ou payload.status)
     const headerEventType = (headers?.['x-zouti-event-type'] || '').toString().toUpperCase();
     const rawStatus = (payload.status || headerEventType || '').toString().toUpperCase();
-    const paymentMethod = (
+    const rawPaymentMethod = (
       payload.payment?.method ||
       payload.payment_method ||
+      payload.payment?.type ||
       payload.metadata?.payment_method ||
       ''
-    ).toString().toUpperCase();
+    ).toString();
+    const paymentMethod = normalizePaymentMethod(rawPaymentMethod);
 
-    const status = this.mapStatus(rawStatus, headerEventType, paymentMethod);
+    const status = this.mapStatus(rawStatus, headerEventType, rawPaymentMethod.toUpperCase());
 
     // 7. Data da Transação
     let transactionDate = new Date().toISOString();
@@ -84,6 +86,35 @@ export class ZoutiParser implements WebhookParser {
 
     const transactionId = payload.id || payload.order_id || payload.order_session_id;
 
+    // 8. ID ou Código da Oferta
+    const offerId = (
+      payload.offer_id ||
+      payload.offer?.id ||
+      payload.offer_code ||
+      payload.offer?.code ||
+      payload.plan?.id ||
+      payload.plan?.code ||
+      payload.items?.[0]?.offer_id ||
+      payload.line_items?.[0]?.offer_id ||
+      payload.metadata?.offer_id ||
+      payload.metadata?.offer_code ||
+      payload.checkout_id ||
+      ''
+    ).toString().trim();
+
+    // 9. UTM Source
+    const metadata = payload.metadata || {};
+    const tracking = payload.tracking || payload.tracking_parameters || {};
+    const utmSource = (
+      metadata.utm_source ||
+      tracking.utm_source ||
+      payload.utm_source ||
+      metadata.src ||
+      tracking.src ||
+      payload.src ||
+      ''
+    ).toString().trim();
+
     return {
       customerName,
       email,
@@ -92,6 +123,9 @@ export class ZoutiParser implements WebhookParser {
       value: isNaN(value) ? 0 : Number(value.toFixed(2)),
       status,
       transactionDate,
+      paymentMethod,
+      offerId,
+      utmSource,
       platform: this.platformName,
       transactionId,
     };

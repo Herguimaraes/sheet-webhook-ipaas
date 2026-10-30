@@ -484,7 +484,7 @@
     </div>
 
     <footer>
-      Micro-iPaaS Backend &bull; Node.js + TypeScript &bull; Hotmart, Hubla, Zouti, TMB Educação
+      Micro-iPaaS Backend &bull; Node.js + TypeScript &bull; Hotmart, Hubla, Zouti, TMB Educação, Kiwify
     </footer>
   </div>
 
@@ -579,6 +579,7 @@
 
     async function testConnection() {
       const sheetInput = document.getElementById('sheetInput').value.trim();
+      const tabName = document.getElementById('tabInput').value.trim() || 'Vendas';
       const resultDiv = document.getElementById('validationResult');
       const btnTest = document.getElementById('btnTest');
 
@@ -589,14 +590,14 @@
       }
 
       btnTest.disabled = true;
-      btnTest.innerText = '⏳ Verificando permissões...';
+      btnTest.innerText = '⏳ Verificando permissões e colunas...';
       resultDiv.style.display = 'none';
 
       try {
         const res = await fetch('/api/validate-sheet', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sheetUrl: sheetInput })
+          body: JSON.stringify({ sheetUrl: sheetInput, tabName: tabName })
         });
 
         const data = await res.json();
@@ -605,8 +606,8 @@
           resultDiv.className = 'result-alert success';
           resultDiv.innerHTML = `<strong>Conexão bem sucedida!</strong><br>` +
             `Planilha: <em>${data.title}</em><br>` +
-            `Abas encontradas: ${data.sheets.join(', ')}<br>` +
-            `O sistema tem permissão para inserir novas vendas.`;
+            `Aba configurada: <strong>${tabName}</strong> (Todas as 10 colunas A:J ativas)<br>` +
+            `O sistema tem permissão de Editor e está 100% pronto para receber vendas.`;
         } else {
           resultDiv.className = 'result-alert error';
           resultDiv.innerHTML = `<strong>Falha na conexão:</strong> ${data.error || 'Não autorizado'}<br>` +

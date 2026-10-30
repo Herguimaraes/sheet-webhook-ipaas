@@ -1,4 +1,4 @@
-import { StandardizedSale } from '../types/sale';
+import { StandardizedSale, normalizePaymentMethod } from '../types/sale';
 import { WebhookParser } from './baseParser';
 
 export class HotmartParser implements WebhookParser {
@@ -94,6 +94,47 @@ export class HotmartParser implements WebhookParser {
 
     const transactionId = purchase.transaction || payload.id || data.transaction;
 
+    // 8. Método ou Tipo de Pagamento
+    const rawPaymentMethod = (
+      purchase.payment?.type ||
+      purchase.payment_type ||
+      data.payment_type ||
+      payload.payment_type ||
+      purchase.payment?.method ||
+      ''
+    ).toString();
+    const paymentMethod = normalizePaymentMethod(rawPaymentMethod);
+
+    // 9. ID ou Código da Oferta
+    const offerId = (
+      purchase.offer?.code ||
+      purchase.offer_code ||
+      purchase.offer ||
+      data.offer?.code ||
+      data.offer_code ||
+      data.offer ||
+      payload.offer?.code ||
+      payload.offer_code ||
+      payload.offer ||
+      payload.off ||
+      data.product?.offer_code ||
+      product.offer_code ||
+      ''
+    ).toString().trim();
+
+    // 10. UTM Source
+    const tracking = purchase.tracking || data.tracking || payload.tracking || {};
+    const utmSource = (
+      tracking.utm_source ||
+      tracking.source ||
+      tracking.source_sck ||
+      tracking.src ||
+      payload.utm_source ||
+      payload.src ||
+      payload.sck ||
+      ''
+    ).toString().trim();
+
     return {
       customerName,
       email,
@@ -102,6 +143,9 @@ export class HotmartParser implements WebhookParser {
       value: isNaN(value) ? 0 : value,
       status,
       transactionDate,
+      paymentMethod,
+      offerId,
+      utmSource,
       platform: this.platformName,
       transactionId,
     };

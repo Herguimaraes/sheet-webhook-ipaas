@@ -1,4 +1,4 @@
-import { StandardizedSale } from '../types/sale';
+import { StandardizedSale, normalizePaymentMethod } from '../types/sale';
 import { WebhookParser } from './baseParser';
 
 export class TmbParser implements WebhookParser {
@@ -71,6 +71,45 @@ export class TmbParser implements WebhookParser {
 
     const transactionId = payload.code || (payload.pedido ? String(payload.pedido) : undefined);
 
+    // 8. Método ou Tipo de Pagamento
+    const rawPaymentMethod = (
+      payload.forma_pagamento ||
+      payload.metodo_pagamento ||
+      payload.tipo_pagamento ||
+      payload.payment_method ||
+      payload.pagamento?.forma ||
+      payload.forma_de_pagamento ||
+      ''
+    ).toString();
+    const paymentMethod = normalizePaymentMethod(rawPaymentMethod);
+
+    // 9. ID ou Código da Oferta
+    const offerId = (
+      payload.codigo_oferta ||
+      payload.id_oferta ||
+      payload.oferta ||
+      payload.offer_id ||
+      payload.offer_code ||
+      payload.cod_oferta ||
+      payload.turma ||
+      payload.codigo_turma ||
+      ''
+    ).toString().trim();
+
+    // 10. UTM Source
+    const tracking = payload.tracking || payload.tracking_parameters || payload.utm || {};
+    const metadata = payload.metadata || {};
+    const utmSource = (
+      payload.utm_source ||
+      tracking.utm_source ||
+      tracking.source ||
+      metadata.utm_source ||
+      payload.src ||
+      payload.origem ||
+      tracking.src ||
+      ''
+    ).toString().trim();
+
     return {
       customerName,
       email,
@@ -79,6 +118,9 @@ export class TmbParser implements WebhookParser {
       value: isNaN(value) ? 0 : Number(value.toFixed(2)),
       status,
       transactionDate,
+      paymentMethod,
+      offerId,
+      utmSource,
       platform: this.platformName,
       transactionId,
     };

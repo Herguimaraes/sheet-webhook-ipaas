@@ -49,14 +49,17 @@ export interface StandardizedSale {
   value: number;           // Valor em reais (R$ float, ex: 197.00)
   status: string;          // Status (ex: 'Aprovado', 'Boleto Impresso', 'Recusado')
   transactionDate: string; // Data da transação em formato ISO
+  paymentMethod?: string;  // Método de pagamento (ex: 'Cartão de Crédito', 'Pix', 'Boleto')
+  offerId?: string;        // ID ou código da oferta
+  utmSource?: string;      // UTM Source da campanha de origem
   platform?: string;       // Identificador da plataforma
   transactionId?: string;  // ID da transação na plataforma de origem
 }
 ```
 
-Linha correspondente inserida no Google Sheets (Colunas **A:G**):
+Linha correspondente inserida no Google Sheets (Colunas **A:J**):
 ```
-[ Nome do Cliente | E-mail | Telefone | Nome do Produto | Valor (R$) | Status | Data da Transação ]
+[ Nome do Cliente | E-mail | Telefone | Nome do Produto | Valor (R$) | Status | Data da Transação | Método de Pagamento | Código da Oferta | UTM Source ]
 ```
 
 ---

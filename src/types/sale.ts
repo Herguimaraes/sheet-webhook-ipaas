@@ -1,6 +1,6 @@
 /**
  * Interface padronizada para todas as vendas recebidas via Webhook.
- * Qualquer plataforma integrada (Hotmart, Hubla, Zouti, TMB Educação)
+ * Qualquer plataforma integrada (Hotmart, Hubla, Zouti, TMB Educação, Kiwify)
  * deve normalizar seu payload para este formato.
  */
 export interface StandardizedSale {
@@ -28,7 +28,16 @@ export interface StandardizedSale {
   /** Data e hora da transação no formato ISO ou Legível */
   transactionDate: string;
 
-  /** Identificador da plataforma de origem (ex: hotmart, hubla, zouti, tmb) */
+  /** Método ou tipo de pagamento (ex: 'Cartão de Crédito', 'Pix', 'Boleto') */
+  paymentMethod?: string;
+
+  /** ID ou código da oferta */
+  offerId?: string;
+
+  /** UTM Source da campanha de origem */
+  utmSource?: string;
+
+  /** Identificador da plataforma de origem (ex: hotmart, hubla, zouti, tmb, kiwify) */
   platform?: string;
 
   /** Identificador ou código da transação/pedido original (opcional) */
@@ -36,9 +45,80 @@ export interface StandardizedSale {
 }
 
 /**
+ * Normaliza o método ou tipo de pagamento para exibição limpa e padronizada.
+ */
+export function normalizePaymentMethod(rawMethod?: any): string {
+  if (!rawMethod || typeof rawMethod !== 'string') return '';
+  const trimmed = rawMethod.trim();
+  const lower = trimmed.toLowerCase();
+
+  if (
+    lower.includes('credit_card') ||
+    lower.includes('creditcard') ||
+    lower.includes('cartao_credito') ||
+    lower.includes('cartão de crédito') ||
+    lower.includes('cartao de credito') ||
+    lower === 'credit'
+  ) {
+    return 'Cartão de Crédito';
+  }
+
+  if (
+    lower.includes('debit_card') ||
+    lower.includes('debitcard') ||
+    lower.includes('cartao_debito') ||
+    lower.includes('cartão de débito') ||
+    lower.includes('cartao de debito') ||
+    lower === 'debit'
+  ) {
+    return 'Cartão de Débito';
+  }
+
+  if (lower.includes('pix')) {
+    if (lower.includes('parcelado')) {
+      return 'Pix Parcelado';
+    }
+    return 'Pix';
+  }
+
+  if (
+    lower.includes('boleto') ||
+    lower.includes('bank_slip') ||
+    lower.includes('billet')
+  ) {
+    if (lower.includes('parcelado')) {
+      return 'Boleto Parcelado';
+    }
+    return 'Boleto';
+  }
+
+  if (lower.includes('paypal')) {
+    return 'PayPal';
+  }
+
+  if (lower.includes('wallet') || lower.includes('carteira')) {
+    return 'Carteira Virtual';
+  }
+
+  if (lower.includes('free') || lower.includes('gratis') || lower.includes('gratuito')) {
+    return 'Gratuito';
+  }
+
+  if (lower.includes('financing') || lower.includes('financiamento')) {
+    return 'Financiamento';
+  }
+
+  if (lower.includes('two_credit_cards') || lower.includes('dois_cartoes')) {
+    return '2 Cartões de Crédito';
+  }
+
+  return trimmed;
+}
+
+/**
  * Converte um objeto StandardizedSale em um array de colunas ordenadas para o Google Sheets.
  * Ordem padrão das colunas:
- * [Nome do Cliente, E-mail, Telefone, Nome do Produto, Valor, Status, Data da Transação]
+ * [Nome do Cliente, E-mail, Telefone, Nome do Produto, Valor, Status, Data da Transação, Método de Pagamento, ID da Oferta, UTM Source]
  */
 export function saleToSheetRow(sale: StandardizedSale): (string | number)[] {
   return [
@@ -49,6 +129,9 @@ export function saleToSheetRow(sale: StandardizedSale): (string | number)[] {
     Number(sale.value.toFixed(2)),
     sale.status || 'N/A',
     sale.transactionDate || new Date().toISOString(),
+    sale.paymentMethod || 'N/A',
+    sale.offerId || 'N/A',
+    sale.utmSource || 'N/A',
   ];
 }
 
@@ -63,4 +146,7 @@ export const DEFAULT_SHEET_HEADERS = [
   'Valor (R$)',
   'Status da Compra',
   'Data da Transação',
+  'Método de Pagamento',
+  'Código da Oferta',
+  'UTM Source',
 ];

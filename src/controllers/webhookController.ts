@@ -31,6 +31,7 @@ export class WebhookController {
    */
   async validateSheet(req: Request, res: Response): Promise<void> {
     const sheetInput = req.body?.sheetUrl || req.body?.sheetId || req.query?.sheetUrl || req.query?.sheetId;
+    const tabName = req.body?.tabName || req.query?.tabName;
 
     if (!sheetInput || typeof sheetInput !== 'string') {
       res.status(400).json({
@@ -40,7 +41,10 @@ export class WebhookController {
       return;
     }
 
-    const result = await googleSheetsService.validateAccess(sheetInput);
+    const result = await googleSheetsService.validateAccess(
+      sheetInput,
+      typeof tabName === 'string' ? tabName : undefined
+    );
     if (!result.valid) {
       res.status(400).json(result);
       return;
@@ -133,6 +137,9 @@ export class WebhookController {
         valor: standardizedSale.value,
         status: standardizedSale.status,
         data: standardizedSale.transactionDate,
+        metodoPagamento: standardizedSale.paymentMethod,
+        oferta: standardizedSale.offerId,
+        utmSource: standardizedSale.utmSource,
         destino: `Sheet: ${sheetId} | Aba: ${tabName}`,
       }
     );
@@ -176,6 +183,9 @@ export class WebhookController {
         value: standardizedSale.value,
         status: standardizedSale.status,
         transactionDate: standardizedSale.transactionDate,
+        paymentMethod: standardizedSale.paymentMethod,
+        offerId: standardizedSale.offerId,
+        utmSource: standardizedSale.utmSource,
       },
     });
 

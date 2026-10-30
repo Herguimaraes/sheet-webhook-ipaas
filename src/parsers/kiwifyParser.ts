@@ -1,4 +1,4 @@
-import { StandardizedSale } from '../types/sale';
+import { StandardizedSale, normalizePaymentMethod } from '../types/sale';
 import { WebhookParser } from './baseParser';
 
 export class KiwifyParser implements WebhookParser {
@@ -17,6 +17,9 @@ export class KiwifyParser implements WebhookParser {
     const customer = payload.Customer || payload.customer || {};
     const product = payload.Product || payload.product || {};
     const commissions = payload.Commissions || payload.commissions || {};
+    const tracking = payload.TrackingParameters || payload.tracking_parameters || {};
+    const subscription = payload.Subscription || payload.subscription || {};
+    const plan = subscription.plan || {};
 
     // 1. Nome do Cliente
     const customerName =
@@ -60,8 +63,13 @@ export class KiwifyParser implements WebhookParser {
       ''
     ).toString().toLowerCase();
 
-    const paymentMethod = (payload.payment_method || '').toString().toLowerCase();
-    const status = this.mapStatus(rawStatus, paymentMethod);
+    const rawPaymentMethod = (
+      payload.payment_method ||
+      payload.order?.payment_method ||
+      ''
+    ).toString();
+    const paymentMethod = normalizePaymentMethod(rawPaymentMethod);
+    const status = this.mapStatus(rawStatus, rawPaymentMethod.toLowerCase());
 
     // 7. Data da Transação
     let transactionDate = new Date().toISOString();
@@ -77,6 +85,28 @@ export class KiwifyParser implements WebhookParser {
       }
     }
 
+    // 8. ID ou Código da Oferta
+    const offerId = (
+      tracking.offer ||
+      payload.offer_id ||
+      payload.offer?.id ||
+      payload.offer_code ||
+      payload.offer?.code ||
+      product.offer_id ||
+      plan.id ||
+      payload.order?.offer_id ||
+      ''
+    ).toString().trim();
+
+    // 9. UTM Source
+    const utmSource = (
+      tracking.utm_source ||
+      tracking.src ||
+      payload.utm_source ||
+      payload.src ||
+      ''
+    ).toString().trim();
+
     const transactionId = payload.order_id || payload.order_ref;
 
     return {
@@ -87,6 +117,9 @@ export class KiwifyParser implements WebhookParser {
       value: isNaN(value) ? 0 : Number(value.toFixed(2)),
       status,
       transactionDate,
+      paymentMethod,
+      offerId,
+      utmSource,
       platform: this.platformName,
       transactionId,
     };

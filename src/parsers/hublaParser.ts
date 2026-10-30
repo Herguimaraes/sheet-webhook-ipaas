@@ -1,4 +1,4 @@
-import { StandardizedSale } from '../types/sale';
+import { StandardizedSale, normalizePaymentMethod } from '../types/sale';
 import { WebhookParser } from './baseParser';
 
 export class HublaParser implements WebhookParser {
@@ -53,8 +53,15 @@ export class HublaParser implements WebhookParser {
 
     // 6. Status da Compra
     const rawStatus = (invoice.status || payload.type || '').toString().toLowerCase();
-    const paymentMethod = (invoice.paymentMethod || '').toString().toLowerCase();
-    const status = this.mapStatus(rawStatus, paymentMethod);
+    const rawPaymentMethod = (
+      invoice.paymentMethod ||
+      invoice.payment_method ||
+      eventData.paymentMethod ||
+      payload.paymentMethod ||
+      ''
+    ).toString();
+    const paymentMethod = normalizePaymentMethod(rawPaymentMethod);
+    const status = this.mapStatus(rawStatus, rawPaymentMethod.toLowerCase());
 
     // 7. Data da Transação
     let transactionDate = new Date().toISOString();
@@ -73,6 +80,36 @@ export class HublaParser implements WebhookParser {
 
     const transactionId = invoice.id || invoice.orderId || payload.id;
 
+    // 8. ID ou Código da Oferta
+    const offerId = (
+      eventData.offer?.id ||
+      eventData.offer?.code ||
+      invoice.offerId ||
+      invoice.offer_id ||
+      product.offerId ||
+      product.offer_id ||
+      product.offer?.id ||
+      product.offer?.code ||
+      payload.offerId ||
+      payload.offer_id ||
+      ''
+    ).toString().trim();
+
+    // 9. UTM Source
+    const metadata = eventData.metadata || invoice.metadata || payload.metadata || {};
+    const tracking = eventData.tracking || invoice.tracking || payload.tracking || {};
+    const utmSource = (
+      metadata.utm_source ||
+      tracking.utm_source ||
+      payload.utm_source ||
+      eventData.utm_source ||
+      metadata.src ||
+      tracking.src ||
+      payload.src ||
+      eventData.src ||
+      ''
+    ).toString().trim();
+
     return {
       customerName,
       email,
@@ -81,6 +118,9 @@ export class HublaParser implements WebhookParser {
       value: isNaN(value) ? 0 : Number(value.toFixed(2)),
       status,
       transactionDate,
+      paymentMethod,
+      offerId,
+      utmSource,
       platform: this.platformName,
       transactionId,
     };

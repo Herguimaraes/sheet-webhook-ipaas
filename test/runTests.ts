@@ -42,6 +42,15 @@ async function runAllTests() {
           value: 497.0,
           currency_value: 'BRL',
         },
+        payment: {
+          type: 'CREDIT_CARD',
+        },
+        offer: {
+          code: 'OFFER_HOTMART_01',
+        },
+        tracking: {
+          utm_source: 'instagram_ads',
+        },
       },
     },
   };
@@ -54,7 +63,12 @@ async function runAllTests() {
   assert(hotmartSale.productName === 'Curso de Next.js Pro', 'Produto deve ser Curso de Next.js Pro');
   assert(hotmartSale.value === 497.0, 'Valor deve ser 497.00');
   assert(hotmartSale.status === 'Aprovado', 'Status deve ser Aprovado');
-  console.log('Linha Google Sheets:', saleToSheetRow(hotmartSale));
+  assert(hotmartSale.paymentMethod === 'Cartão de Crédito', 'Método de pagamento deve ser Cartão de Crédito');
+  assert(hotmartSale.offerId === 'OFFER_HOTMART_01', 'Código da oferta deve ser OFFER_HOTMART_01');
+  assert(hotmartSale.utmSource === 'instagram_ads', 'UTM Source deve ser instagram_ads');
+  const hotmartRow = saleToSheetRow(hotmartSale);
+  assert(hotmartRow.length === 10, 'Linha do Sheets deve ter 10 colunas');
+  console.log('Linha Google Sheets:', hotmartRow);
   console.log('✅ HotmartParser validado com sucesso!\n');
 
   // ==========================================
@@ -71,10 +85,16 @@ async function runAllTests() {
         id: 'inAVzweR0QYw5y03K5mq',
         name: 'Comunidade VIP Dev',
       },
+      offer: {
+        id: 'offer_hubla_99',
+      },
+      metadata: {
+        utm_source: 'youtube_live',
+      },
       invoice: {
         id: '7614b1bb-1d1a-43ba-890c-50d74216eb56',
         status: 'paid',
-        paymentMethod: 'credit_card',
+        paymentMethod: 'pix',
         amount: {
           totalCents: 112320,
           total: 1123.2,
@@ -98,7 +118,12 @@ async function runAllTests() {
   assert(hublaSale.productName === 'Comunidade VIP Dev', 'Produto deve ser Comunidade VIP Dev');
   assert(hublaSale.value === 1123.2, 'Valor deve ser 1123.20');
   assert(hublaSale.status === 'Aprovado', 'Status deve ser Aprovado');
-  console.log('Linha Google Sheets:', saleToSheetRow(hublaSale));
+  assert(hublaSale.paymentMethod === 'Pix', 'Método de pagamento deve ser Pix');
+  assert(hublaSale.offerId === 'offer_hubla_99', 'Código da oferta deve ser offer_hubla_99');
+  assert(hublaSale.utmSource === 'youtube_live', 'UTM Source deve ser youtube_live');
+  const hublaRow = saleToSheetRow(hublaSale);
+  assert(hublaRow.length === 10, 'Linha do Sheets deve ter 10 colunas');
+  console.log('Linha Google Sheets:', hublaRow);
   console.log('✅ HublaParser validado com sucesso!\n');
 
   // ==========================================
@@ -113,6 +138,13 @@ async function runAllTests() {
     status: 'PAID',
     amount_total_in_brl: 197.9,
     paid_at: '2024-12-16T19:50:17.044Z',
+    payment: {
+      method: 'BOLETO',
+    },
+    offer_id: 'zouti_offer_123',
+    metadata: {
+      utm_source: 'facebook_feed',
+    },
     items: [
       {
         name: 'Mentoria Exclusiva de Vendas',
@@ -136,7 +168,12 @@ async function runAllTests() {
   assert(zoutiSale.productName === 'Mentoria Exclusiva de Vendas', 'Produto deve ser Mentoria Exclusiva de Vendas');
   assert(zoutiSale.value === 197.9, 'Valor deve ser 197.90');
   assert(zoutiSale.status === 'Aprovado', 'Status deve ser Aprovado');
-  console.log('Linha Google Sheets:', saleToSheetRow(zoutiSale));
+  assert(zoutiSale.paymentMethod === 'Boleto', 'Método de pagamento deve ser Boleto');
+  assert(zoutiSale.offerId === 'zouti_offer_123', 'Código da oferta deve ser zouti_offer_123');
+  assert(zoutiSale.utmSource === 'facebook_feed', 'UTM Source deve ser facebook_feed');
+  const zoutiRow = saleToSheetRow(zoutiSale);
+  assert(zoutiRow.length === 10, 'Linha do Sheets deve ter 10 colunas');
+  console.log('Linha Google Sheets:', zoutiRow);
   console.log('✅ ZoutiParser validado com sucesso!\n');
 
   // ==========================================
@@ -155,6 +192,9 @@ async function runAllTests() {
     email: 'marcos.vinicius@example.com',
     telefone_ativo: '(11) 97777-6666',
     valor_total: 2500.0,
+    forma_pagamento: 'cartao_credito',
+    codigo_oferta: 'TMB_TURMA_2026',
+    utm_source: 'google_search',
     criado_em: '2026-06-01T10:30:00',
     data_efetivado: '2026-06-01T14:15:00',
     titulo: 'Curso de Pós-Graduação Executiva',
@@ -169,7 +209,14 @@ async function runAllTests() {
   assert(tmbSale.productName === 'Curso de Pós-Graduação Executiva', 'Produto deve ser Curso de Pós-Graduação Executiva');
   assert(tmbSale.value === 2500.0, 'Valor deve ser 2500.00');
   assert(tmbSale.status === 'Aprovado', 'Status deve ser Aprovado');
-  console.log('Linha Google Sheets:', saleToSheetRow(tmbSale));
+  assert(tmbSale.paymentMethod === 'Cartão de Crédito', 'Método de pagamento deve ser Cartão de Crédito');
+  assert(tmbSale.offerId === 'TMB_TURMA_2026', 'Código da oferta deve ser TMB_TURMA_2026');
+  assert(tmbSale.utmSource === 'google_search', 'UTM Source deve ser google_search');
+  const tmbRow = saleToSheetRow(tmbSale);
+  assert(tmbRow.length === 10, 'Linha do Sheets deve ter 10 colunas');
+  console.log('Linha Google Sheets:', tmbRow);
+  console.log('✅ TmbParser validado com sucesso!\n');
+
   // ==========================================
   // 5. TESTE KIWIFY
   // ==========================================
@@ -198,6 +245,10 @@ async function runAllTests() {
       charge_amount: 19700,
       product_base_price: 19700,
     },
+    TrackingParameters: {
+      offer: 'kiwi_offer_xyz',
+      utm_source: 'whatsapp_group',
+    },
   };
 
   const kiwifySale = kiwifyParser!.parse(kiwifyPayload);
@@ -208,7 +259,13 @@ async function runAllTests() {
   assert(kiwifySale.productName === 'Método Vendas Automáticas', 'Produto deve ser Método Vendas Automáticas');
   assert(kiwifySale.value === 197.0, 'Valor deve ser 197.00 (convertido de centavos 19700)');
   assert(kiwifySale.status === 'Aprovado', 'Status deve ser Aprovado');
-  console.log('Linha Google Sheets:', saleToSheetRow(kiwifySale));
+  assert(kiwifySale.paymentMethod === 'Cartão de Crédito', 'Método de pagamento deve ser Cartão de Crédito');
+  assert(kiwifySale.offerId === 'kiwi_offer_xyz', 'Código da oferta deve ser kiwi_offer_xyz');
+  assert(kiwifySale.utmSource === 'whatsapp_group', 'UTM Source deve ser whatsapp_group');
+  const kiwifyRow = saleToSheetRow(kiwifySale);
+  assert(kiwifyRow.length === 10, 'Linha do Sheets deve ter 10 colunas');
+  console.log('Linha Google Sheets:', kiwifyRow);
+  console.log('✅ KiwifyParser validado com sucesso!\n');
   console.log('✅ KiwifyParser validado com sucesso!\n');
 
   console.log('🎉 TODOS OS PARSERS FORAM TESTADOS E VALIDADOS COM SUCESSO!');

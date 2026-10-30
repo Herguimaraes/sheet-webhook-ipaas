@@ -50,6 +50,9 @@ async function testHttpEndpoint() {
               transaction: 'HP11223344',
               status: 'APPROVED',
               full_price: { value: 297.0 },
+              payment: { type: 'PIX' },
+              offer: { code: 'OFR_FS_2026' },
+              tracking: { utm_source: 'linkedin_post' },
             },
           },
         }),
@@ -58,8 +61,14 @@ async function testHttpEndpoint() {
 
     const webhookJson = await webhookRes.json();
     console.log('Webhook Hotmart response:', webhookJson);
-    if (webhookRes.status !== 200 || webhookJson.status !== 'acknowledged') {
-      throw new Error('Endpoint webhook falhou!');
+    if (
+      webhookRes.status !== 200 ||
+      webhookJson.status !== 'acknowledged' ||
+      webhookJson.sale?.paymentMethod !== 'Pix' ||
+      webhookJson.sale?.offerId !== 'OFR_FS_2026' ||
+      webhookJson.sale?.utmSource !== 'linkedin_post'
+    ) {
+      throw new Error('Endpoint webhook falhou ou dados de pagamento/oferta/utm não foram retornados!');
     }
 
     // 4. Testar Validação de Planilha com corpo vazio (esperado 400)
