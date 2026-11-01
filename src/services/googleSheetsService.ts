@@ -163,9 +163,10 @@ export class GoogleSheetsService {
       console.log(
         `[GoogleSheetsService] Aba '${tabName}' está sem cabeçalho. Inserindo colunas padrão automaticamente...`
       );
+      const endCol = this.getColumnLetter(DEFAULT_SHEET_HEADERS.length);
       await sheets.spreadsheets.values.update({
         spreadsheetId,
-        range: `${formattedTabName}!A1:J1`,
+        range: `${formattedTabName}!A1:${endCol}1`,
         valueInputOption: 'USER_ENTERED',
         requestBody: {
           values: [DEFAULT_SHEET_HEADERS],
@@ -173,7 +174,7 @@ export class GoogleSheetsService {
       });
       headersAdded = true;
     } else {
-      // Se a aba já possuía cabeçalhos, verifica se alguma das 10 colunas está ausente ou vazia
+      // Se a aba já possuía cabeçalhos, verifica se alguma das colunas está ausente ou vazia
       const existingHeaders = headerCheck.data.values[0] || [];
       const missingUpdates: { colIndex: number; title: string }[] = [];
 
@@ -260,7 +261,7 @@ export class GoogleSheetsService {
 
     const rowValues = saleToSheetRow(sale);
     const formattedTabName = this.formatTabRange(tabName);
-    const range = `${formattedTabName}!A:J`;
+    const range = `${formattedTabName}!A:K`;
 
     try {
       const response = await sheets.spreadsheets.values.append({

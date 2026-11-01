@@ -57,9 +57,9 @@ export interface StandardizedSale {
 }
 ```
 
-Linha correspondente inserida no Google Sheets (Colunas **A:J**):
+Linha correspondente inserida no Google Sheets (Colunas **A:K**):
 ```
-[ Nome do Cliente | E-mail | Telefone | Nome do Produto | Valor (R$) | Status | Data da Transação | Método de Pagamento | Código da Oferta | UTM Source ]
+[ Nome do Cliente | E-mail | Telefone | Nome do Produto | Valor (R$) | Status | Data da Transação | Método de Pagamento | Código da Oferta | UTM Source | Plataforma ]
 ```
 
 ---

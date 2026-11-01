@@ -66,8 +66,10 @@ async function runAllTests() {
   assert(hotmartSale.paymentMethod === 'Cartão de Crédito', 'Método de pagamento deve ser Cartão de Crédito');
   assert(hotmartSale.offerId === 'OFFER_HOTMART_01', 'Código da oferta deve ser OFFER_HOTMART_01');
   assert(hotmartSale.utmSource === 'instagram_ads', 'UTM Source deve ser instagram_ads');
+  assert(hotmartSale.platform === 'hotmart', 'Plataforma deve ser hotmart');
   const hotmartRow = saleToSheetRow(hotmartSale);
-  assert(hotmartRow.length === 10, 'Linha do Sheets deve ter 10 colunas');
+  assert(hotmartRow.length === 11, 'Linha do Sheets deve ter 11 colunas');
+  assert(hotmartRow[10] === 'Hotmart', 'Coluna 11 deve ser Hotmart');
   console.log('Linha Google Sheets:', hotmartRow);
   console.log('✅ HotmartParser validado com sucesso!\n');
 
@@ -121,8 +123,10 @@ async function runAllTests() {
   assert(hublaSale.paymentMethod === 'Pix', 'Método de pagamento deve ser Pix');
   assert(hublaSale.offerId === 'offer_hubla_99', 'Código da oferta deve ser offer_hubla_99');
   assert(hublaSale.utmSource === 'youtube_live', 'UTM Source deve ser youtube_live');
+  assert(hublaSale.platform === 'hubla', 'Plataforma deve ser hubla');
   const hublaRow = saleToSheetRow(hublaSale);
-  assert(hublaRow.length === 10, 'Linha do Sheets deve ter 10 colunas');
+  assert(hublaRow.length === 11, 'Linha do Sheets deve ter 11 colunas');
+  assert(hublaRow[10] === 'Hubla', 'Coluna 11 deve ser Hubla');
   console.log('Linha Google Sheets:', hublaRow);
   console.log('✅ HublaParser validado com sucesso!\n');
 
@@ -171,8 +175,10 @@ async function runAllTests() {
   assert(zoutiSale.paymentMethod === 'Boleto', 'Método de pagamento deve ser Boleto');
   assert(zoutiSale.offerId === 'zouti_offer_123', 'Código da oferta deve ser zouti_offer_123');
   assert(zoutiSale.utmSource === 'facebook_feed', 'UTM Source deve ser facebook_feed');
+  assert(zoutiSale.platform === 'zouti', 'Plataforma deve ser zouti');
   const zoutiRow = saleToSheetRow(zoutiSale);
-  assert(zoutiRow.length === 10, 'Linha do Sheets deve ter 10 colunas');
+  assert(zoutiRow.length === 11, 'Linha do Sheets deve ter 11 colunas');
+  assert(zoutiRow[10] === 'Zouti', 'Coluna 11 deve ser Zouti');
   console.log('Linha Google Sheets:', zoutiRow);
   console.log('✅ ZoutiParser validado com sucesso!\n');
 
@@ -212,8 +218,10 @@ async function runAllTests() {
   assert(tmbSale.paymentMethod === 'Cartão de Crédito', 'Método de pagamento deve ser Cartão de Crédito');
   assert(tmbSale.offerId === 'TMB_TURMA_2026', 'Código da oferta deve ser TMB_TURMA_2026');
   assert(tmbSale.utmSource === 'google_search', 'UTM Source deve ser google_search');
+  assert(tmbSale.platform === 'tmb', 'Plataforma deve ser tmb');
   const tmbRow = saleToSheetRow(tmbSale);
-  assert(tmbRow.length === 10, 'Linha do Sheets deve ter 10 colunas');
+  assert(tmbRow.length === 11, 'Linha do Sheets deve ter 11 colunas');
+  assert(tmbRow[10] === 'TMB Educação', 'Coluna 11 deve ser TMB Educação');
   console.log('Linha Google Sheets:', tmbRow);
   console.log('✅ TmbParser validado com sucesso!\n');
 
@@ -262,8 +270,10 @@ async function runAllTests() {
   assert(kiwifySale.paymentMethod === 'Cartão de Crédito', 'Método de pagamento deve ser Cartão de Crédito');
   assert(kiwifySale.offerId === 'kiwi_offer_xyz', 'Código da oferta deve ser kiwi_offer_xyz');
   assert(kiwifySale.utmSource === 'whatsapp_group', 'UTM Source deve ser whatsapp_group');
+  assert(kiwifySale.platform === 'kiwify', 'Plataforma deve ser kiwify');
   const kiwifyRow = saleToSheetRow(kiwifySale);
-  assert(kiwifyRow.length === 10, 'Linha do Sheets deve ter 10 colunas');
+  assert(kiwifyRow.length === 11, 'Linha do Sheets deve ter 11 colunas');
+  assert(kiwifyRow[10] === 'Kiwify', 'Coluna 11 deve ser Kiwify');
   console.log('Linha Google Sheets:', kiwifyRow);
   console.log('✅ KiwifyParser validado com sucesso!\n');
   console.log('✅ KiwifyParser validado com sucesso!\n');

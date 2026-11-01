@@ -129,6 +129,9 @@ export class WebhookController {
       return;
     }
 
+    // Garante que o identificador da plataforma esteja preenchido
+    standardizedSale.platform = standardizedSale.platform || parser.platformName;
+
     console.log(
       `[WebhookController] Webhook recebido com sucesso da plataforma [${parser.platformName}]:`,
       {
@@ -140,6 +143,7 @@ export class WebhookController {
         metodoPagamento: standardizedSale.paymentMethod,
         oferta: standardizedSale.offerId,
         utmSource: standardizedSale.utmSource,
+        plataforma: standardizedSale.platform,
         destino: `Sheet: ${sheetId} | Aba: ${tabName}`,
       }
     );
@@ -186,6 +190,7 @@ export class WebhookController {
         paymentMethod: standardizedSale.paymentMethod,
         offerId: standardizedSale.offerId,
         utmSource: standardizedSale.utmSource,
+        platform: standardizedSale.platform,
       },
     });
 

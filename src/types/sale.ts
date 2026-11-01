@@ -116,9 +116,23 @@ export function normalizePaymentMethod(rawMethod?: any): string {
 }
 
 /**
+ * Formata o identificador da plataforma para um nome de exibição amigável e profissional.
+ */
+export function formatPlatformDisplayName(platform?: string): string {
+  if (!platform || typeof platform !== 'string') return 'N/A';
+  const lower = platform.toLowerCase().trim();
+  if (lower.includes('hotmart')) return 'Hotmart';
+  if (lower.includes('hubla')) return 'Hubla';
+  if (lower.includes('zouti')) return 'Zouti';
+  if (lower.includes('tmb')) return 'TMB Educação';
+  if (lower.includes('kiwify')) return 'Kiwify';
+  return platform.charAt(0).toUpperCase() + platform.slice(1);
+}
+
+/**
  * Converte um objeto StandardizedSale em um array de colunas ordenadas para o Google Sheets.
  * Ordem padrão das colunas:
- * [Nome do Cliente, E-mail, Telefone, Nome do Produto, Valor, Status, Data da Transação, Método de Pagamento, ID da Oferta, UTM Source]
+ * [Nome do Cliente, E-mail, Telefone, Nome do Produto, Valor, Status, Data da Transação, Método de Pagamento, ID da Oferta, UTM Source, Plataforma]
  */
 export function saleToSheetRow(sale: StandardizedSale): (string | number)[] {
   return [
@@ -132,6 +146,7 @@ export function saleToSheetRow(sale: StandardizedSale): (string | number)[] {
     sale.paymentMethod || 'N/A',
     sale.offerId || 'N/A',
     sale.utmSource || 'N/A',
+    formatPlatformDisplayName(sale.platform),
   ];
 }
 
@@ -149,4 +164,5 @@ export const DEFAULT_SHEET_HEADERS = [
   'Método de Pagamento',
   'Código da Oferta',
   'UTM Source',
+  'Plataforma',
 ];

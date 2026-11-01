@@ -66,9 +66,10 @@ async function testHttpEndpoint() {
       webhookJson.status !== 'acknowledged' ||
       webhookJson.sale?.paymentMethod !== 'Pix' ||
       webhookJson.sale?.offerId !== 'OFR_FS_2026' ||
-      webhookJson.sale?.utmSource !== 'linkedin_post'
+      webhookJson.sale?.utmSource !== 'linkedin_post' ||
+      webhookJson.sale?.platform !== 'hotmart'
     ) {
-      throw new Error('Endpoint webhook falhou ou dados de pagamento/oferta/utm não foram retornados!');
+      throw new Error('Endpoint webhook falhou ou dados de pagamento/oferta/utm/plataforma não foram retornados!');
     }
 
     // 4. Testar Validação de Planilha com corpo vazio (esperado 400)
